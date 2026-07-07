@@ -1,0 +1,26 @@
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+.animate-fade-in{animation:fadeIn var(--dur-slow) var(--ease) both}
+.animate-fade-up{animation:fadeUp var(--dur-slow) var(--ease) both}
+.animate-scale-in{animation:scaleIn var(--dur-base) var(--ease) both}
+.animate-slide-down{animation:slideDown var(--dur-base) var(--ease) both}
+.stagger-1{animation-delay:.05s}
+.stagger-2{animation-delay:.1s}
+.stagger-3{animation-delay:.15s}
+.stagger-4{animation-delay:.2s}
+.stagger-5{animation-delay:.25s}
+
+.skeleton{
+  background:linear-gradient(90deg,var(--surface-alt) 25%,var(--border) 50%,var(--surface-alt) 75%);
+  background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+}

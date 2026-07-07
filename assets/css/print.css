@@ -1,0 +1,9 @@
+@media print{
+  .navbar,.site-footer,.no-print,.nav-burger,.mobile-menu,.hero-cta,.toast-stack{display:none !important}
+  body{background:#fff !important;color:#000 !important}
+  .card,.issue-card,.stat-tile{box-shadow:none !important;border:1px solid #ccc !important}
+  a{color:#000 !important;text-decoration:none !important}
+  .section{padding-block:var(--space-6) !important}
+  .container{max-width:100% !important;padding:0 !important}
+  .issue-card{break-inside:avoid}
+}

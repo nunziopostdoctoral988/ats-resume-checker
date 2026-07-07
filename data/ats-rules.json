@@ -1,0 +1,48 @@
+{
+  "categoryWeights": {
+    "keywordMatch": 0.22,
+    "structure": 0.14,
+    "formatting": 0.14,
+    "writingQuality": 0.14,
+    "achievements": 0.14,
+    "experience": 0.10,
+    "education": 0.06,
+    "contact": 0.06
+  },
+  "scoreBands": [
+    { "min": 90, "grade": "A+", "label": "Excellent", "color": "var(--score-excellent)" },
+    { "min": 80, "grade": "A", "label": "Very Good", "color": "var(--score-excellent)" },
+    { "min": 70, "grade": "B", "label": "Good", "color": "var(--score-good)" },
+    { "min": 60, "grade": "C", "label": "Fair", "color": "var(--score-fair)" },
+    { "min": 50, "grade": "D", "label": "Needs Work", "color": "var(--score-fair)" },
+    { "min": 0,  "grade": "F", "label": "Poor", "color": "var(--score-poor)" }
+  ],
+  "atsProfiles": {
+    "generic": { "label": "Generic ATS", "strictness": 1.0, "note": "Standard keyword + structure parsing, tolerant of minor formatting issues." },
+    "strict": { "label": "Strict / Legacy ATS", "strictness": 1.25, "note": "Older enterprise systems (e.g. Taleo-style). Penalizes tables, columns, graphics and non-standard headers heavily." },
+    "modern": { "label": "Modern / AI-assisted ATS", "strictness": 0.85, "note": "Newer systems with semantic matching. More forgiving of synonyms and layout, still penalizes missing keywords." }
+  },
+  "seniorityExpectedYears": {
+    "Intern": [0, 1],
+    "Entry / Junior": [0, 2],
+    "Mid-level": [2, 5],
+    "Senior": [5, 10],
+    "Lead / Principal": [8, 30]
+  },
+  "countryConventions": {
+    "USA": { "spelling": "US", "photoExpected": false, "dateFormat": "MM/DD/YYYY", "resumeName": "Resume", "note": "No photo, no age, no marital status. 1 page preferred for <10 yrs experience." },
+    "UK": { "spelling": "UK", "photoExpected": false, "dateFormat": "DD/MM/YYYY", "resumeName": "CV", "note": "Called a CV. No photo. Can run 2 pages." },
+    "Canada": { "spelling": "US", "photoExpected": false, "dateFormat": "MM/DD/YYYY", "resumeName": "Resume", "note": "Similar to US conventions." },
+    "Australia": { "spelling": "UK", "photoExpected": false, "dateFormat": "DD/MM/YYYY", "resumeName": "Resume", "note": "No photo. 2-3 pages acceptable." },
+    "Germany": { "spelling": "UK", "photoExpected": true, "dateFormat": "DD.MM.YYYY", "resumeName": "Lebenslauf", "note": "Photo and personal details more common, but increasingly optional." },
+    "Singapore": { "spelling": "UK", "photoExpected": false, "dateFormat": "DD/MM/YYYY", "resumeName": "Resume", "note": "US/UK hybrid conventions." },
+    "India": { "spelling": "UK", "photoExpected": false, "dateFormat": "DD/MM/YYYY", "resumeName": "Resume/CV", "note": "Photo optional, increasingly discouraged for corporate roles." },
+    "Bangladesh": { "spelling": "UK", "photoExpected": true, "dateFormat": "DD/MM/YYYY", "resumeName": "CV", "note": "Photo commonly included; keep professional and recent." }
+  },
+  "formattingRisks": {
+    "maxRecommendedPages": 2,
+    "minWordsWarn": 150,
+    "maxWordsWarn": 1100,
+    "idealBulletLength": [8, 28]
+  }
+}

@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS Report &mdash; ATS Resume Checker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%93%84</text></svg>">
+<link rel="stylesheet" href="../assets/css/variables.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/animations.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
+<link rel="stylesheet" href="../assets/css/print.css">
+</head>
+<body data-page="upload">
+<div id="navbar-root" class="no-print"></div>
+
+<main class="container" style="padding-block:var(--space-8) var(--space-16)">
+  <div id="empty-state" style="display:none;text-align:center;padding-block:var(--space-16)">
+    <h3>No report found</h3>
+    <p class="text-muted" style="margin-block:var(--space-3) var(--space-6)">Run a new analysis to see your ATS report here.</p>
+    <a href="upload.html" class="btn btn-primary">Check a Resume</a>
+  </div>
+
+  <div id="report-root" style="display:none">
+    <div id="exec-header"></div>
+    <div class="card animate-fade-up" style="margin-top:var(--space-8)">
+      <h3 style="margin-bottom:var(--space-4)">Category Breakdown</h3>
+      <div id="category-breakdown"></div>
+    </div>
+    <div class="card animate-fade-up" style="margin-top:var(--space-6)">
+      <h3 style="margin-bottom:var(--space-2)">Section Weight Analysis</h3>
+      <p class="text-muted" style="font-size:var(--fs-sm);margin-bottom:var(--space-4)">How each category is weighted into your overall score &mdash; no hidden math.</p>
+      <div id="section-weights"></div>
+    </div>
+    <div class="card animate-fade-up" style="margin-top:var(--space-6)">
+      <h3 style="margin-bottom:var(--space-4)">Strengths</h3>
+      <div id="strengths"></div>
+    </div>
+    <div class="card animate-fade-up" style="margin-top:var(--space-6)">
+      <h3 style="margin-bottom:var(--space-2)">Keyword Match</h3>
+      <div id="keyword-match"></div>
+    </div>
+    <div style="margin-top:var(--space-8)">
+      <h3 style="margin-bottom:var(--space-4)">Priority Fixes</h3>
+      <div class="tabs no-print" id="issue-tabs">
+        <div class="tab active" data-filter="all">All</div>
+        <div class="tab" data-filter="critical">Critical</div>
+        <div class="tab" data-filter="high">High</div>
+        <div class="tab" data-filter="medium">Medium</div>
+        <div class="tab" data-filter="low">Low</div>
+      </div>
+      <div id="issues"></div>
+    </div>
+    <div class="card animate-fade-up" style="margin-top:var(--space-6)">
+      <h3 style="margin-bottom:var(--space-4)">Improvement Roadmap</h3>
+      <div id="roadmap"></div>
+    </div>
+  </div>
+</main>
+
+<div id="footer-root" class="no-print"></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/utils.js"></script>
+<script src="../assets/js/validator.js"></script>
+<script src="../assets/js/storage.js"></script>
+<script src="../assets/js/ats-checker.js"></script>
+<script src="../assets/js/charts.js"></script>
+<script src="../assets/js/export.js"></script>
+<script src="../assets/js/app.js"></script>
+
+<script>
+const CAT_LABELS = { keywordMatch: "Keyword Match", structure: "Section Structure", formatting: "Formatting", writingQuality: "Writing Quality", achievements: "Achievements", experience: "Experience", education: "Education", contact: "Contact Info" };
+const HEALTH_BADGE = { Green: "badge-good", Yellow: "badge-medium", Red: "badge-critical" };
+
+let currentReport = null;
+
+function renderExecHeader(r) {
+  document.getElementById("exec-header").innerHTML = `
+    <div class="card animate-fade-up">
+      <div class="flex justify-between items-center" style="flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-6)">
+        <div>
+          <div class="eyebrow">ATS Report</div>
+          <h2 style="margin-bottom:4px">${Utils.escapeHtml(r.fileName)}</h2>
+          <p class="text-muted" style="font-size:var(--fs-sm)">Target role: <strong>${Utils.escapeHtml(r.role)}</strong>${r.seniority ? " &middot; " + r.seniority : ""}${r.country ? " &middot; " + r.country : ""}</p>
+        </div>
+        <div class="flex-col gap-2 no-print" style="align-items:flex-end">
+          <div class="flex gap-2">
+            <input type="text" id="brand-name" placeholder="Prepared by (optional)" style="border:1px solid var(--border);border-radius:var(--radius-md);padding:6px 10px;font-size:var(--fs-xs);background:var(--surface);color:var(--text);width:180px">
+            <button class="btn btn-primary btn-sm" id="btn-pdf-premium">Download Premium PDF Report</button>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-secondary btn-sm" id="btn-pdf">Quick Print</button>
+            <button class="btn btn-secondary btn-sm" id="btn-json">Download JSON</button>
+            <button class="btn btn-secondary btn-sm" id="btn-copy">Copy Summary</button>
+            <a href="upload.html" class="btn btn-primary btn-sm">New Analysis</a>
+          </div>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:auto 1fr;gap:var(--space-10);align-items:center">
+        ${Charts.gauge(r.overallScore)}
+        <div class="flex-col gap-3">
+          <div class="flex gap-2" style="flex-wrap:wrap">
+            <span class="badge" style="background:${r.gradeColor};color:#fff">Grade ${r.grade} &middot; ${r.gradeLabel}</span>
+            <span class="badge ${HEALTH_BADGE[r.health]}">Resume Health: ${r.health}</span>
+            <span class="badge badge-low">${r.atsProfile}</span>
+          </div>
+          <div class="stat-tile" style="max-width:420px">
+            <div class="stat-value">${r.passProbability}%</div>
+            <div class="stat-label">Estimated ATS Pass Probability</div>
+            <p class="text-muted" style="font-size:var(--fs-xs);margin-top:var(--space-2)">Formula: 60% overall score + 40% keyword match. A transparent estimate, not a guarantee of any real employer's ATS outcome.</p>
+          </div>
+          <p class="text-muted" style="font-size:var(--fs-xs)">${Utils.escapeHtml(r.atsProfileNote)}</p>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById("btn-pdf").addEventListener("click", Exporter.printReport);
+  document.getElementById("btn-json").addEventListener("click", () => Exporter.downloadJSON(r));
+  document.getElementById("btn-copy").addEventListener("click", () => Exporter.copyShareSummary(r));
+  document.getElementById("btn-pdf-premium").addEventListener("click", () => downloadPremiumPDF(r));
+}
+
+function recruiterSummary(r) {
+  const critical = r.issues.filter((i) => i.severity === "critical").length;
+  const high = r.issues.filter((i) => i.severity === "high").length;
+  const topCat = r.roadmap.items[0] ? (CAT_LABELS[r.roadmap.items[0].cat] || r.roadmap.items[0].cat) : null;
+  const action = r.health === "Green" ? "This resume is in strong shape and ready for recruiter review." :
+    r.health === "Yellow" ? "This resume needs targeted revisions before it's fully interview-ready." :
+    "This resume needs significant revisions before submission — several critical issues would likely cause automatic rejection by ATS filters.";
+  return `This candidate's resume scored ${r.overallScore}/100 (Grade ${r.grade} &mdash; ${r.gradeLabel}) for the ${Utils.escapeHtml(r.role)} role. ` +
+    `${r.strengths.length ? "Key strengths: " + r.strengths.slice(0, 2).map(Utils.escapeHtml).join(" and ") + ". " : ""}` +
+    `${critical + high > 0 ? `${critical} critical and ${high} high-priority issue(s) were flagged` + (topCat ? `, primarily around ${topCat}` : "") + ". " : "No critical or high-priority issues were flagged. "}` +
+    `${action}`;
+}
+
+function reportPageChrome(idx, total, title, brand, body) {
+  return `<section class="report-page">
+    <div class="report-header"><span>ATS Resume Analysis Report</span><span>${Utils.escapeHtml(title)}</span></div>
+    <div class="report-body">${body}</div>
+    <div class="report-footer"><span>${brand ? "Prepared by " + Utils.escapeHtml(brand) : "ATS Resume Checker"}</span><span>Page ${idx} of ${total}</span></div>
+  </section>`;
+}
+
+function downloadPremiumPDF(r) {
+  const esc = Utils.escapeHtml;
+  const brand = document.getElementById("brand-name").value.trim();
+  const base = new URL(".", location.href).href;
+  const date = new Date(r.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+
+  const cover = `
+    <div style="text-align:center;padding-top:60mm">
+      <div class="eyebrow">ATS Resume Analysis Report</div>
+      <h1 style="font-size:32px;margin:16px 0 8px">${esc(r.fileName)}</h1>
+      <p style="color:#555;font-size:14px">${esc(r.role)} &middot; ${r.seniority || "Seniority not specified"} &middot; ${r.country || "Country not specified"}</p>
+      <p style="color:#888;font-size:12px;margin-top:4px">Analysis Date: ${date}</p>
+      <div style="margin:36px 0">${Charts.gauge(r.overallScore)}</div>
+      <p style="font-size:20px;font-weight:800;color:${r.gradeColor}">Grade ${r.grade} &mdash; ${esc(r.gradeLabel)}</p>
+      <p style="color:#555;font-size:13px;margin-top:8px">Estimated ATS Pass Probability: <strong>${r.passProbability}%</strong></p>
+      ${brand ? `<p style="margin-top:40px;color:#888;font-size:12px">Prepared by ${esc(brand)}</p>` : ""}
+    </div>`;
+
+  const toc = `<h2>Table of Contents</h2><ol style="line-height:2">
+    <li><a href="#p-summary">Executive Summary</a></li>
+    <li><a href="#p-categories">Category Breakdown</a></li>
+    <li><a href="#p-roadmap">Priority Roadmap</a></li>
+    <li><a href="#p-flagged">Flagged Issues &amp; Fixes</a></li>
+    <li><a href="#p-notes">Recruiter Notes</a></li>
+  </ol>`;
+
+  const critical = r.issues.filter((i) => i.severity === "critical").length;
+  const high = r.issues.filter((i) => i.severity === "high").length;
+  const summary = `<div id="p-summary">
+    <h2>Executive Summary</h2>
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0">
+      <div class="stat-tile"><div class="stat-value">${r.overallScore}</div><div class="stat-label">ATS Score</div></div>
+      <div class="stat-tile"><div class="stat-value">${r.grade}</div><div class="stat-label">Resume Grade</div></div>
+      <div class="stat-tile"><div class="stat-value">${r.health}</div><div class="stat-label">Resume Health</div></div>
+      <div class="stat-tile"><div class="stat-value">${r.passProbability}%</div><div class="stat-label">Pass Probability</div></div>
+    </div>
+    <div style="text-align:center;margin:24px 0">${Charts.radar(r.categoryScores, CAT_LABELS)}</div>
+    <h3>Strengths</h3>
+    <ul>${r.strengths.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
+    <p style="color:#555;font-size:13px">${critical} critical &middot; ${high} high &middot; ${r.issues.length} total issues flagged.</p>
+  </div>`;
+
+  const categories = `<div id="p-categories"><h2>Category Breakdown</h2>` +
+    Object.entries(r.categoryScores).map(([k, v]) => {
+      const catIssues = r.issues.filter((i) => i.category === k).slice(0, 3);
+      return `<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #eee">
+        <div class="flex justify-between items-center"><strong>${CAT_LABELS[k]}</strong><span style="color:${Utils.scoreColor(v)};font-weight:800">${v}/100</span></div>
+        <div class="progress" style="margin:8px 0"><div class="progress-fill" style="width:${v}%;background:${Utils.scoreColor(v)}"></div></div>
+        ${catIssues.length ? `<ul style="font-size:12px;color:#555">${catIssues.map((i) => `<li>${esc(i.title)} &mdash; ${esc(i.why)}</li>`).join("")}</ul>` : `<p style="font-size:12px;color:#555">No issues flagged in this category.</p>`}
+      </div>`;
+    }).join("") + `</div>`;
+
+  const roadmap = `<div id="p-roadmap"><h2>Priority Roadmap</h2>
+    <p style="color:#555;font-size:13px;margin-bottom:12px">Highest-impact categories to fix first, ranked by weight &times; deficiency:</p>
+    <ol style="line-height:1.9">${r.roadmap.items.map((it) => `<li><strong>${CAT_LABELS[it.cat]}</strong> &mdash; currently ${it.score}/100 (weight ${Math.round(it.weight * 100)}%)</li>`).join("") || "<li>Categories are well balanced &mdash; no single priority fix stands out.</li>"}</ol>
+    <p style="margin-top:12px;font-size:13px">Fixing the above could realistically raise the overall score toward <strong>~${Utils.clamp(r.overallScore + r.roadmap.potentialGain, 0, 100)}</strong>.</p>
+  </div>`;
+
+  const flagged = `<div id="p-flagged"><h2>Flagged Issues &amp; Fixes</h2>` +
+    r.issues.slice(0, 14).map((i) => {
+      const color = i.severity === "critical" ? "#dc2626" : i.severity === "high" ? "#c2410c" : i.severity === "medium" ? "#d97706" : "#0891b2";
+      return `<div style="border-left:4px solid ${color};padding:8px 14px;margin-bottom:12px;background:#fafafa">
+        <strong>${esc(i.title)}</strong> <span style="color:${color};font-size:10px;text-transform:uppercase;font-weight:800">${i.severity}</span>
+        <p style="font-size:12px;color:#555;margin:4px 0">${esc(i.why)}</p>
+        <p style="font-size:12px;color:#333"><em>Fix:</em> ${i.suggestion.replace(/<[^>]+>/g, " ").trim()}</p>
+      </div>`;
+    }).join("") + `</div>`;
+
+  const notes = `<div id="p-notes"><h2>Recruiter Notes</h2>
+    <p style="font-size:13px;line-height:1.7">${recruiterSummary(r)}</p>
+    <p style="font-size:11px;color:#999;margin-top:16px">Auto-generated summary based on the rule-based analysis in this report &mdash; not a substitute for human review.</p>
+  </div>`;
+
+  const pages = [cover, toc, summary, categories, roadmap, flagged, notes];
+  const body = pages.map((p, i) => reportPageChrome(i + 1, pages.length, r.fileName, brand, p)).join("");
+
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(r.fileName)} — ATS Report</title><base href="${base}">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <style>
+      @page{ size:A4; margin:16mm; }
+      body{ color:#111; background:#fff }
+      .report-page{ page-break-after:always; min-height:250mm; position:relative; padding-bottom:24px }
+      .report-page:last-child{ page-break-after:auto }
+      .report-header{ display:flex;justify-content:space-between;font-size:10px;color:#999;border-bottom:1px solid #eee;padding-bottom:8px;margin-bottom:20px }
+      .report-footer{ position:absolute;bottom:0;left:0;right:0;font-size:9px;color:#aaa;display:flex;justify-content:space-between;border-top:1px solid #eee;padding-top:6px }
+      h2{ font-size:20px;margin-bottom:12px }
+    </style>
+    </head><body>${body}</body></html>`;
+
+  const w = window.open("", "_blank");
+  if (!w) { Utils.toast("Please allow pop-ups to generate the premium PDF", "error"); return; }
+  w.document.write(html);
+  w.document.close();
+  w.onload = () => { w.focus(); w.print(); };
+}
+
+function renderCategoryBreakdown(r) {
+  document.getElementById("category-breakdown").innerHTML =
+    Object.entries(r.categoryScores).map(([k, v]) => Charts.categoryBar(CAT_LABELS[k] || k, v)).join("");
+}
+
+function renderSectionWeights(r) {
+  document.getElementById("section-weights").innerHTML = r.sectionWeights.map((s) => `
+    <div class="flex justify-between items-center" style="padding-block:var(--space-2);border-bottom:1px solid var(--border);font-size:var(--fs-sm)">
+      <span>${CAT_LABELS[s.category] || s.category}</span>
+      <span class="text-muted">weight ${s.weight}% &times; score ${s.score} =</span>
+      <strong>${s.contribution} pts</strong>
+    </div>`).join("");
+}
+
+function renderStrengths(r) {
+  document.getElementById("strengths").innerHTML = `<div class="flex-col gap-2">` +
+    r.strengths.map((s) => `<div class="flex items-center gap-2" style="font-size:var(--fs-sm)"><span style="color:var(--success-500)">&#10003;</span>${Utils.escapeHtml(s)}</div>`).join("") +
+    `</div>`;
+}
+
+function renderKeywordMatch(r) {
+  const k = r.keywordRes;
+  const matched = k.matched.slice(0, 30);
+  const missing = k.missing.slice(0, 30);
+  document.getElementById("keyword-match").innerHTML = `
+    <p class="text-muted" style="font-size:var(--fs-sm);margin-bottom:var(--space-4)">${k.matchPct}% match &middot; ${k.usedJD ? "based on the job description you pasted" : "based on your selected role's expected skill set (no job description provided)"}</p>
+    <div class="chip-group" style="margin-bottom:var(--space-4)">
+      ${matched.map((m) => `<span class="chip matched">${Utils.escapeHtml(m)}</span>`).join("")}
+      ${k.matched.length > 30 ? `<span class="chip">+${k.matched.length - 30} more</span>` : ""}
+    </div>
+    <div class="chip-group">
+      ${missing.map((m) => `<span class="chip missing">${Utils.escapeHtml(m)}</span>`).join("")}
+      ${k.missing.length > 30 ? `<span class="chip">+${k.missing.length - 30} more</span>` : ""}
+    </div>`;
+}
+
+function issueCard(i) {
+  const hasExample = /<span class="label">Before<\/span>/.test(i.suggestion || "");
+  return `
+    <div class="issue-card ${i.severity} animate-fade-up" data-severity="${i.severity}">
+      <div class="issue-head">
+        <span class="issue-title">${Utils.escapeHtml(i.title)}</span>
+        <span class="flex gap-2"><span class="badge badge-${i.severity}">${i.severity}</span></span>
+      </div>
+      <p class="issue-why">${Utils.escapeHtml(i.why)}</p>
+      <p class="text-muted" style="font-size:var(--fs-xs);margin-bottom:var(--space-2)"><strong>Where:</strong> ${Utils.escapeHtml(i.where)} &middot; ${i.confidence}</p>
+      ${hasExample
+        ? `<div class="issue-example"><div class="example-block before">${i.suggestion.split("<br>")[0]}</div><div class="example-block after">${i.suggestion.split("<br>")[1] || ""}</div></div>`
+        : `<p style="font-size:var(--fs-sm)">${i.suggestion}</p>`}
+    </div>`;
+}
+
+function renderIssues(r, filter = "all") {
+  const list = filter === "all" ? r.issues : r.issues.filter((i) => i.severity === filter);
+  document.getElementById("issues").innerHTML = list.length
+    ? list.map(issueCard).join("")
+    : `<p class="text-muted">No issues in this category. Nice work.</p>`;
+}
+
+function renderRoadmap(r) {
+  const items = r.roadmap.items;
+  document.getElementById("roadmap").innerHTML = items.length ? `
+    <ol class="flex-col gap-3" style="list-style:decimal;padding-left:20px">
+      ${items.map((it) => `<li style="font-size:var(--fs-sm)"><strong>${CAT_LABELS[it.cat] || it.cat}</strong> is scoring ${it.score}/100 (weight ${Math.round(it.weight * 100)}%) &mdash; improving this category has the highest impact on your overall score.</li>`).join("")}
+    </ol>
+    <p style="margin-top:var(--space-4);font-size:var(--fs-sm)">Fixing the items above could realistically raise your score toward <strong>~${Utils.clamp(r.overallScore + r.roadmap.potentialGain, 0, 100)}</strong>.</p>
+  ` : `<p class="text-muted">Your categories are well balanced &mdash; no single area is dragging your score down.</p>`;
+}
+
+function render(r) {
+  currentReport = r;
+  renderExecHeader(r);
+  renderCategoryBreakdown(r);
+  renderSectionWeights(r);
+  renderStrengths(r);
+  renderKeywordMatch(r);
+  renderIssues(r);
+  renderRoadmap(r);
+  document.getElementById("issue-tabs").addEventListener("click", (e) => {
+    const tab = e.target.closest(".tab");
+    if (!tab) return;
+    Utils.qsa(".tab", document.getElementById("issue-tabs")).forEach((t) => t.classList.remove("active"));
+    tab.classList.add("active");
+    renderIssues(r, tab.dataset.filter);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const id = new URLSearchParams(location.search).get("id");
+  const report = (id && Storage.getReport(id)) || Storage.getCurrentReport();
+  if (!report) { document.getElementById("empty-state").style.display = "block"; return; }
+  document.getElementById("report-root").style.display = "block";
+  render(report);
+});
+</script>
+</body>
+</html>

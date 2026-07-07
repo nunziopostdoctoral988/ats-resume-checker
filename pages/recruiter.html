@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulk Resume Screening &mdash; ATS Resume Checker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%93%84</text></svg>">
+<link rel="stylesheet" href="../assets/css/variables.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/animations.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
+<link rel="stylesheet" href="../assets/css/print.css">
+<style>
+  .rank-table{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
+  .rank-table th{text-align:left;padding:var(--space-3);border-bottom:2px solid var(--border);font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);white-space:nowrap}
+  .rank-table th.sortable{cursor:pointer;user-select:none}
+  .rank-table th.sortable:hover{color:var(--text)}
+  .rank-table td{padding:var(--space-3);border-bottom:1px solid var(--border);vertical-align:middle}
+  .rank-table tr:hover{background:var(--surface-alt)}
+  .rank-table tr.selected-row{background:var(--brand-50)}
+  .rank-pill{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--surface-alt);font-weight:800;font-size:var(--fs-xs)}
+  .score-pill{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:4px 8px;border-radius:var(--radius-full);font-weight:800;color:#fff;font-size:var(--fs-xs)}
+  .status-pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--radius-full);font-size:var(--fs-xs);font-weight:700;cursor:pointer;border:1px solid transparent}
+  .status-unreviewed{background:var(--surface-alt);color:var(--text-muted)}
+  .status-shortlisted{background:var(--success-100);color:var(--success-500)}
+  .status-interview{background:var(--info-100);color:var(--info-500)}
+  .status-rejected{background:var(--danger-100);color:var(--danger-500)}
+  .stars{cursor:pointer;letter-spacing:2px;color:var(--gray-300)}
+  .stars .filled{color:#f5b301}
+  .notes-icon{cursor:pointer;opacity:.6}
+  .notes-icon.has-note{opacity:1;color:var(--brand-500)}
+</style>
+</head>
+<body data-page="recruiter">
+<div id="navbar-root"></div>
+
+<main class="container" style="padding-block:var(--space-10) var(--space-16)">
+  <div class="section-head" style="margin-bottom:var(--space-8)">
+    <div class="eyebrow">For Companies</div>
+    <h2>Bulk Resume Screening</h2>
+    <p>Paste your job requirement once, upload hundreds of resumes at once, and get every candidate ranked, filtered, and exportable.</p>
+  </div>
+
+  <div id="setup-view">
+    <div class="grid" style="grid-template-columns:1fr 1fr;align-items:start">
+      <div class="card animate-fade-up">
+        <h3 style="margin-bottom:var(--space-4)">1. Job Requirement</h3>
+        <div class="field" style="margin-bottom:var(--space-4)">
+          <label for="jd-text">Job Description / Requirements</label>
+          <textarea id="jd-text" rows="12" placeholder="Paste the full job description or required skills/qualifications here..."></textarea>
+          <div class="field-meta"><span id="jd-count">0 words</span></div>
+        </div>
+        <div class="field" style="margin-bottom:var(--space-4)">
+          <label for="role-search">Target Role (fills gaps if requirement is short)</label>
+          <input type="text" id="role-search" placeholder="e.g. Backend Developer" autocomplete="off">
+          <div id="role-dropdown" style="display:none;position:relative;z-index:20;max-height:240px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);margin-top:4px"></div>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr">
+          <div class="field">
+            <label for="seniority">Seniority</label>
+            <select id="seniority" style="width:100%;border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3);background:var(--surface);color:var(--text)">
+              <option value="">Any</option><option>Intern</option><option>Entry / Junior</option><option>Mid-level</option><option>Senior</option><option>Lead / Principal</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="ats-profile">ATS Profile</label>
+            <select id="ats-profile" style="width:100%;border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3);background:var(--surface);color:var(--text)"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animate-fade-up stagger-1">
+        <h3 style="margin-bottom:var(--space-4)">2. Upload Resumes (multiple)</h3>
+        <div class="upload-box" id="upload-box" tabindex="0" role="button">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <h3>Drag &amp; drop resumes</h3>
+          <p class="text-muted" style="font-size:var(--fs-sm)">or click to browse &mdash; PDF, DOCX or TXT, multiple files, folders where your browser supports it</p>
+          <div class="upload-meta">Everything is processed locally in this browser tab. Nothing is uploaded anywhere.</div>
+          <input type="file" id="file-input" accept=".pdf,.docx,.txt" multiple hidden>
+        </div>
+        <div id="file-count" class="text-muted" style="font-size:var(--fs-sm);margin-top:var(--space-3)">No files selected</div>
+        <div class="flex gap-2" style="margin-top:var(--space-3)">
+          <button class="btn btn-primary btn-block btn-lg" id="screen-btn" disabled>Screen All Candidates</button>
+          <button class="btn btn-ghost btn-sm" id="clear-files" style="display:none">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="progress-view" style="display:none;text-align:center;padding-block:var(--space-16)">
+    <div class="spinner" style="margin-inline:auto"></div>
+    <h3 style="margin-top:var(--space-6)" id="progress-text">Screening 0 / 0...</h3>
+    <div class="progress" style="max-width:420px;margin:var(--space-4) auto 0"><div class="progress-fill" id="progress-fill" style="width:0%;background:var(--brand-500)"></div></div>
+    <button class="btn btn-secondary btn-sm" id="cancel-btn" style="margin-top:var(--space-6)">Cancel Processing</button>
+  </div>
+
+  <div id="results-view" style="display:none">
+
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--space-3);margin-bottom:var(--space-6)" id="dashboard"></div>
+
+    <div class="flex justify-between items-center" style="flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-3)">
+      <h3 id="results-heading"></h3>
+      <div class="flex gap-2" style="flex-wrap:wrap">
+        <input type="text" id="search-box" placeholder="Search by name or file..." style="border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);background:var(--surface);color:var(--text)">
+        <input type="number" id="min-score" min="0" max="100" placeholder="Min score" style="width:100px;border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);background:var(--surface);color:var(--text)">
+        <select id="quick-filter" style="border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);background:var(--surface);color:var(--text)">
+          <option value="all">All Candidates</option>
+          <option value="top10">Top 10 by Score</option>
+          <option value="top25">Top 25 by Score</option>
+          <option value="top50">Top 50 by Score</option>
+          <option value="gradeA">Grade A / A+ Only</option>
+          <option value="score90">Score &ge; 90</option>
+          <option value="score80">Score &ge; 80</option>
+          <option value="shortlisted">Shortlisted</option>
+          <option value="interview">Interview</option>
+          <option value="rejected">Rejected</option>
+          <option value="unreviewed">Unreviewed</option>
+          <option value="selected">Selected Only</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" id="retry-btn" style="display:none">Retry Failed</button>
+        <button class="btn btn-ghost btn-sm" id="new-batch">New Batch</button>
+      </div>
+    </div>
+    <p class="text-muted" style="font-size:var(--fs-xs);margin-bottom:var(--space-4)">All filters + the current quick-filter apply to every export below. "Selected Only" exports just the checked rows.</p>
+
+    <div class="flex gap-2" style="flex-wrap:wrap;margin-bottom:var(--space-4)">
+      <button class="btn btn-secondary btn-sm" id="export-csv">Export CSV</button>
+      <button class="btn btn-secondary btn-sm" id="export-json">Export Data (.zip of JSON)</button>
+      <button class="btn btn-secondary btn-sm" id="export-pdf-zip">Individual PDFs (.zip, original filenames)</button>
+      <button class="btn btn-secondary btn-sm" id="export-pdf-all">Combined PDF (one file, all candidates)</button>
+      <button class="btn btn-secondary btn-sm" id="compare-btn" disabled>Compare Selected (2&ndash;4)</button>
+      <span class="flex gap-2" style="margin-left:auto">
+        <button class="btn btn-ghost btn-sm" id="bulk-shortlist">Mark Shortlisted</button>
+        <button class="btn btn-ghost btn-sm" id="bulk-interview">Mark Interview</button>
+        <button class="btn btn-ghost btn-sm" id="bulk-rejected">Mark Rejected</button>
+      </span>
+    </div>
+
+    <div id="compare-panel" style="display:none;margin-bottom:var(--space-6)"></div>
+
+    <div class="card" style="padding:0;overflow-x:auto">
+      <table class="rank-table">
+        <thead><tr>
+          <th><input type="checkbox" id="select-all"></th>
+          <th>#</th>
+          <th class="sortable" data-sort="candidateName">Candidate</th>
+          <th class="sortable" data-sort="fileName">File</th>
+          <th class="sortable" data-sort="matchPct">Match %</th>
+          <th class="sortable" data-sort="overallScore">ATS Score</th>
+          <th class="sortable" data-sort="grade">Grade</th>
+          <th class="sortable" data-sort="years">Experience</th>
+          <th>Status</th>
+          <th>Rating</th>
+          <th>Notes</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="rank-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<div id="footer-root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.7.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/utils.js"></script>
+<script src="../assets/js/validator.js"></script>
+<script src="../assets/js/storage.js"></script>
+<script src="../assets/js/parser.js"></script>
+<script src="../assets/js/ats-checker.js"></script>
+<script src="../assets/js/charts.js"></script>
+<script src="../assets/js/export.js"></script>
+<script src="../assets/js/app.js"></script>
+
+<script>
+let jobFiles = [], roleCategory = "", roleName = "", candidates = [];
+let failedFiles = [], selected = new Set(), lastAnchorIdx = null;
+let sortState = { key: "overallScore", dir: "desc" };
+let cancelRequested = false, processingStart = 0, processingMs = 0;
+
+function candKey(c, idx) { return c.id || `err-${idx}-${c.fileName}`; }
+
+function populate() {
+  const profileSel = document.getElementById("ats-profile");
+  Object.entries(ATSData.atsRules.atsProfiles).forEach(([key, p]) => {
+    const o = document.createElement("option"); o.value = key; o.textContent = p.label; profileSel.appendChild(o);
+  });
+  profileSel.value = "generic";
+}
+
+function setupRoleSearch() {
+  const input = document.getElementById("role-search");
+  const dropdown = document.getElementById("role-dropdown");
+  input.addEventListener("input", Utils.debounce(() => {
+    const q = input.value.trim().toLowerCase();
+    if (q.length < 1) { dropdown.style.display = "none"; return; }
+    let html = "";
+    ATSData.jobRoles.categories.forEach((cat) => {
+      const hits = cat.roles.filter((r) => r.toLowerCase().includes(q));
+      if (!hits.length) return;
+      html += `<div style="padding:6px 12px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text-muted);background:var(--surface-alt)">${cat.name}</div>`;
+      hits.slice(0, 6).forEach((r) => { html += `<div class="role-option" data-cat="${cat.id}" data-role="${Utils.escapeHtml(r)}" style="padding:8px 12px;cursor:pointer;font-size:14px">${Utils.escapeHtml(r)}</div>`; });
+    });
+    dropdown.innerHTML = html; dropdown.style.display = html ? "block" : "none";
+  }, 150));
+  dropdown.addEventListener("click", (e) => {
+    const opt = e.target.closest(".role-option"); if (!opt) return;
+    roleCategory = opt.dataset.cat; roleName = opt.dataset.role;
+    input.value = roleName; dropdown.style.display = "none";
+  });
+}
+
+function setupUpload() {
+  const box = document.getElementById("upload-box");
+  const input = document.getElementById("file-input");
+  box.addEventListener("click", () => input.click());
+  ["dragenter", "dragover"].forEach((evt) => box.addEventListener(evt, (e) => { e.preventDefault(); box.classList.add("drag-active"); }));
+  ["dragleave", "drop"].forEach((evt) => box.addEventListener(evt, (e) => { e.preventDefault(); box.classList.remove("drag-active"); }));
+  box.addEventListener("drop", (e) => { addFiles(Array.from(e.dataTransfer.files)); });
+  input.addEventListener("change", (e) => addFiles(Array.from(e.target.files)));
+  document.getElementById("clear-files").addEventListener("click", () => {
+    jobFiles = [];
+    document.getElementById("file-count").textContent = "No files selected";
+    document.getElementById("screen-btn").disabled = true;
+    document.getElementById("clear-files").style.display = "none";
+  });
+}
+
+function addFiles(list) {
+  const invalid = list.filter((f) => !["pdf", "docx", "txt"].includes(f.name.split(".").pop().toLowerCase()));
+  let valid = list.filter((f) => ["pdf", "docx", "txt"].includes(f.name.split(".").pop().toLowerCase()));
+  const existingKeys = new Set(jobFiles.map((f) => f.name + "|" + f.size));
+  let dupCount = 0;
+  valid = valid.filter((f) => {
+    const k = f.name + "|" + f.size;
+    if (existingKeys.has(k)) { dupCount++; return false; }
+    existingKeys.add(k);
+    return true;
+  });
+  const overflow = Math.max(0, jobFiles.length + valid.length - 5000);
+  if (overflow > 0) valid = valid.slice(0, Math.max(0, valid.length - overflow));
+  jobFiles = jobFiles.concat(valid);
+  document.getElementById("file-count").textContent = `${jobFiles.length} file(s) selected`;
+  document.getElementById("screen-btn").disabled = jobFiles.length === 0;
+  document.getElementById("clear-files").style.display = jobFiles.length ? "inline-flex" : "none";
+  if (invalid.length) Utils.toast(`${invalid.length} file(s) skipped — unsupported format`, "error");
+  if (dupCount) Utils.toast(`${dupCount} duplicate file(s) skipped`, "error");
+}
+
+function setupJD() {
+  const ta = document.getElementById("jd-text");
+  ta.addEventListener("input", () => {
+    document.getElementById("jd-count").textContent = `${(ta.value.match(/\S+/g) || []).length} words`;
+  });
+}
+
+async function runScreening(fileList, { isRetry = false } = {}) {
+  document.getElementById("setup-view").style.display = "none";
+  document.getElementById("progress-view").style.display = "block";
+  cancelRequested = false;
+  if (!isRetry) { candidates = []; failedFiles = []; selected.clear(); processingStart = performance.now(); }
+  const jdText = document.getElementById("jd-text").value;
+  const seniority = document.getElementById("seniority").value;
+  const atsProfileKey = document.getElementById("ats-profile").value;
+  const batchId = Utils.uid();
+
+  for (let i = 0; i < fileList.length; i++) {
+    if (cancelRequested) break;
+    const file = fileList[i];
+    document.getElementById("progress-text").textContent = `Screening ${i + 1} / ${fileList.length}...`;
+    document.getElementById("progress-fill").style.width = `${Math.round(((i + 1) / fileList.length) * 100)}%`;
+    if (isRetry) candidates = candidates.filter((c) => !(c.error && c.fileName === file.name));
+    try {
+      const { text, pageCount, ocrUsed } = await Parser.readFile(file);
+      if (!text || text.trim().length < 20) { candidates.push({ error: "Could not extract text", fileName: file.name }); failedFiles.push(file); continue; }
+      const report = AtsChecker.analyze({
+        resumeText: text, jdText, roleCategory, roleName, seniority, country: "", atsProfileKey,
+        fileName: file.name, pageCount, ocrUsed,
+      });
+      report.resumeTextPreview = report.resumeTextPreview.slice(0, 1200);
+      report.candidateName = Parser.extractName(text) || file.name.replace(/\.(pdf|docx|txt)$/i, "");
+      report.batchId = batchId;
+      report.recruiterMeta = { status: "unreviewed", rating: 0, notes: "" };
+      Storage.saveBulkReport(report);
+      candidates.push(report);
+    } catch (err) {
+      candidates.push({ error: err.message, fileName: file.name });
+      failedFiles.push(file);
+    }
+    if (i % 5 === 0) await new Promise((r) => setTimeout(r, 0));
+  }
+
+  processingMs = performance.now() - processingStart;
+  candidates.sort((a, b) => (b.overallScore ?? -1) - (a.overallScore ?? -1));
+  Storage.saveBulkBatch({ id: batchId, createdAt: Date.now(), count: candidates.length, jdSnippet: jdText.slice(0, 120), candidateIds: candidates.filter((c) => c.id).map((c) => c.id) });
+  renderDashboard();
+  renderResults();
+}
+
+function renderDashboard() {
+  const ok = candidates.filter((c) => !c.error);
+  const scores = ok.map((c) => c.overallScore);
+  const matches = ok.map((c) => c.keywordRes.matchPct);
+  const avg = (arr) => (arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 0);
+  const tiles = [
+    ["Total Uploaded", candidates.length],
+    ["Processed", ok.length],
+    ["Failed", candidates.length - ok.length],
+    ["Avg Score", avg(scores)],
+    ["Highest Score", scores.length ? Math.max(...scores) : 0],
+    ["Lowest Score", scores.length ? Math.min(...scores) : 0],
+    ["Avg Match %", avg(matches)],
+    ["Processing Time", `${(processingMs / 1000).toFixed(1)}s`],
+  ];
+  document.getElementById("dashboard").innerHTML = tiles.map(([label, value]) =>
+    `<div class="stat-tile"><div class="stat-value" style="font-size:var(--fs-2xl)">${value}</div><div class="stat-label">${label}</div></div>`
+  ).join("");
+}
+
+function passesFilter(c) {
+  const q = document.getElementById("search-box").value.trim().toLowerCase();
+  const minRaw = document.getElementById("min-score").value;
+  const minScore = minRaw === "" ? null : parseInt(minRaw, 10);
+  const qf = document.getElementById("quick-filter").value;
+  if (q && !(c.candidateName || c.fileName || "").toLowerCase().includes(q)) return false;
+  if (minScore !== null) { if (c.error) return false; if (c.overallScore < minScore) return false; }
+  if (qf === "selected") return selected.has(candKey(c, candidates.indexOf(c)));
+  if (["shortlisted", "interview", "rejected", "unreviewed"].includes(qf)) {
+    if (c.error) return false;
+    return c.recruiterMeta.status === qf;
+  }
+  if (qf === "gradeA") return !c.error && (c.grade === "A" || c.grade === "A+");
+  if (qf === "score90") return !c.error && c.overallScore >= 90;
+  if (qf === "score80") return !c.error && c.overallScore >= 80;
+  return true;
+}
+
+function getFilteredList() {
+  let list = candidates.filter(passesFilter);
+  const qf = document.getElementById("quick-filter").value;
+  if (qf === "top10" || qf === "top25" || qf === "top50") {
+    const n = qf === "top10" ? 10 : qf === "top25" ? 25 : 50;
+    list = list.filter((c) => !c.error).sort((a, b) => b.overallScore - a.overallScore).slice(0, n);
+  }
+  const dir = sortState.dir === "asc" ? 1 : -1;
+  list = list.slice().sort((a, b) => {
+    if (a.error || b.error) return 0;
+    let av, bv;
+    if (sortState.key === "matchPct") { av = a.keywordRes.matchPct; bv = b.keywordRes.matchPct; }
+    else if (sortState.key === "years") { av = a.experienceRes.totalYears; bv = b.experienceRes.totalYears; }
+    else { av = a[sortState.key]; bv = b[sortState.key]; }
+    if (typeof av === "string") return av.localeCompare(bv) * dir;
+    return ((av ?? 0) - (bv ?? 0)) * dir;
+  });
+  return list;
+}
+
+function persist(c) { if (c.id) Storage.saveBulkReport(c); }
+
+function starHtml(c) {
+  const idx = candidates.indexOf(c);
+  let html = `<span class="stars" data-key="${candKey(c, idx)}">`;
+  for (let s = 1; s <= 5; s++) html += `<span data-star="${s}" class="${c.recruiterMeta.rating >= s ? "filled" : ""}">&#9733;</span>`;
+  return html + "</span>";
+}
+
+function renderResults() {
+  document.getElementById("progress-view").style.display = "none";
+  document.getElementById("results-view").style.display = "block";
+  document.getElementById("retry-btn").style.display = failedFiles.length ? "inline-flex" : "none";
+  if (failedFiles.length) document.getElementById("retry-btn").textContent = `Retry Failed (${failedFiles.length})`;
+
+  const list = getFilteredList();
+  document.getElementById("results-heading").textContent = `${list.length} / ${candidates.length} Candidates Shown`;
+  document.getElementById("rank-body").innerHTML = list.map((c, idx) => {
+    const key = candKey(c, candidates.indexOf(c));
+    if (c.error) return `<tr><td></td><td class="rank-pill">-</td><td colspan="8" class="text-muted">${Utils.escapeHtml(c.fileName)} &mdash; ${Utils.escapeHtml(c.error)}</td><td></td></tr>`;
+    const status = c.recruiterMeta.status;
+    return `<tr class="${selected.has(key) ? "selected-row" : ""}" data-key="${key}">
+      <td><input type="checkbox" class="row-check" data-key="${key}" ${selected.has(key) ? "checked" : ""}></td>
+      <td><span class="rank-pill">${idx + 1}</span></td>
+      <td><strong>${Utils.escapeHtml(c.candidateName)}</strong></td>
+      <td class="text-muted">${Utils.escapeHtml(c.fileName)}</td>
+      <td><strong>${c.keywordRes.matchPct}%</strong></td>
+      <td>${c.overallScore}/100</td>
+      <td><span class="score-pill" style="background:${c.gradeColor}">${c.grade}</span></td>
+      <td>${c.experienceRes.totalYears}y</td>
+      <td><span class="status-pill status-${status}" data-key="${key}">${status}</span></td>
+      <td>${starHtml(c)}</td>
+      <td><span class="notes-icon ${c.recruiterMeta.notes ? "has-note" : ""}" data-key="${key}" title="${Utils.escapeHtml(c.recruiterMeta.notes || "Add note")}">&#128221;</span></td>
+      <td><a href="report.html?id=${c.id}" target="_blank" class="btn btn-secondary btn-sm">View</a></td>
+    </tr>`;
+  }).join("");
+
+  Utils.qsa(".row-check").forEach((cb) => cb.addEventListener("click", (e) => onRowCheck(e, list)));
+  Utils.qsa(".status-pill").forEach((el) => el.addEventListener("click", () => cycleStatus(el.dataset.key)));
+  Utils.qsa(".stars").forEach((el) => {
+    Utils.qsa("span", el).forEach((star) => star.addEventListener("click", () => setRating(el.dataset.key, parseInt(star.dataset.star, 10))));
+  });
+  Utils.qsa(".notes-icon").forEach((el) => el.addEventListener("click", () => editNote(el.dataset.key)));
+  updateCompareState();
+}
+
+function findByKey(key) { return candidates.find((c, i) => candKey(c, i) === key); }
+
+function onRowCheck(e, visibleList) {
+  const key = e.target.dataset.key;
+  if (e.shiftKey && lastAnchorIdx !== null) {
+    const keys = visibleList.map((c) => candKey(c, candidates.indexOf(c)));
+    const cur = keys.indexOf(key);
+    const [from, to] = [lastAnchorIdx, cur].sort((a, b) => a - b);
+    for (let i = from; i <= to; i++) selected.add(keys[i]);
+  } else {
+    if (e.target.checked) selected.add(key); else selected.delete(key);
+  }
+  lastAnchorIdx = visibleList.map((c) => candKey(c, candidates.indexOf(c))).indexOf(key);
+  renderResults();
+}
+
+function cycleStatus(key) {
+  const c = findByKey(key); if (!c) return;
+  const order = ["unreviewed", "shortlisted", "interview", "rejected"];
+  c.recruiterMeta.status = order[(order.indexOf(c.recruiterMeta.status) + 1) % order.length];
+  persist(c); renderResults();
+}
+
+function setRating(key, val) {
+  const c = findByKey(key); if (!c) return;
+  c.recruiterMeta.rating = c.recruiterMeta.rating === val ? 0 : val;
+  persist(c); renderResults();
+}
+
+function editNote(key) {
+  const c = findByKey(key); if (!c) return;
+  const note = prompt(`Note for ${c.candidateName}:`, c.recruiterMeta.notes || "");
+  if (note === null) return;
+  c.recruiterMeta.notes = note;
+  persist(c); renderResults();
+}
+
+function bulkSetStatus(status) {
+  if (!selected.size) { Utils.toast("Select at least one candidate first", "error"); return; }
+  selected.forEach((key) => { const c = findByKey(key); if (c && !c.error) { c.recruiterMeta.status = status; persist(c); } });
+  renderResults();
+}
+
+function updateCompareState() {
+  document.getElementById("compare-btn").disabled = !(selected.size >= 2 && selected.size <= 4);
+}
+
+function renderCompare() {
+  const panel = document.getElementById("compare-panel");
+  const chosen = Array.from(selected).map(findByKey).filter((c) => c && !c.error);
+  if (chosen.length < 2) { panel.style.display = "none"; return; }
+  const rows = [
+    ["Candidate", chosen.map((c) => c.candidateName)],
+    ["ATS Score", chosen.map((c) => c.overallScore)],
+    ["Grade", chosen.map((c) => c.grade)],
+    ["Keyword Match", chosen.map((c) => c.keywordRes.matchPct + "%")],
+    ["Experience", chosen.map((c) => c.experienceRes.totalYears + "y")],
+    ["Education", chosen.map((c) => (c.educationRes.hasDegree ? "Degree found" : "Not found"))],
+    ["Top Strength", chosen.map((c) => c.strengths[0] || "-")],
+    ["Top Issue", chosen.map((c) => (c.issues[0] ? c.issues[0].title : "-"))],
+    ["Rating", chosen.map((c) => "&#9733;".repeat(c.recruiterMeta.rating) || "-")],
+  ];
+  panel.innerHTML = `<div class="card" style="overflow-x:auto"><h3 style="margin-bottom:var(--space-4)">Candidate Comparison</h3>
+    <table class="rank-table"><tbody>
+      ${rows.map((r) => `<tr><td style="font-weight:700">${r[0]}</td>${r[1].map((v) => `<td>${v}</td>`).join("")}</tr>`).join("")}
+    </tbody></table></div>`;
+  panel.style.display = "block";
+}
+
+const PDF_CAT_LABELS = { keywordMatch: "Keyword Match", structure: "Section Structure", formatting: "Formatting", writingQuality: "Writing Quality", achievements: "Achievements", experience: "Experience", education: "Education", contact: "Contact Info" };
+
+function scoreRGB(score) {
+  if (score >= 85) return [22, 163, 74];
+  if (score >= 70) return [101, 163, 13];
+  if (score >= 50) return [217, 119, 6];
+  return [220, 38, 38];
+}
+function severityRGB(sev) {
+  return { critical: [220, 38, 38], high: [194, 65, 12], medium: [217, 119, 6], low: [8, 145, 178] }[sev] || [100, 100, 100];
+}
+
+function buildCandidatePDFBlob(c) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const pageW = 210, marginX = 14;
+  let y;
+
+  const drawHeader = () => {
+    doc.setFillColor(59, 99, 242);
+    doc.rect(0, 0, pageW, 26, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(15); doc.text(c.candidateName, marginX, 13);
+    doc.setFontSize(9); doc.text(`${c.fileName}  |  Target role: ${c.role || "General"}`, marginX, 20);
+  };
+  const drawFooter = (pageNum, pageCount) => {
+    doc.setFontSize(8); doc.setTextColor(150, 150, 150);
+    doc.text("ATS Resume Checker — Bulk Screening Report", marginX, 290);
+    doc.text(`Page ${pageNum} of ${pageCount}`, pageW - marginX, 290, { align: "right" });
+  };
+
+  drawHeader();
+  y = 36;
+
+  const cards = [
+    ["ATS Score", c.overallScore + "/100", scoreRGB(c.overallScore)],
+    ["Grade", `${c.grade} · ${c.gradeLabel}`, scoreRGB(c.overallScore)],
+    ["Keyword Match", c.keywordRes.matchPct + "%", scoreRGB(c.keywordRes.matchPct)],
+    ["Pass Probability", c.passProbability + "%", scoreRGB(c.passProbability)],
+  ];
+  const boxW = (pageW - marginX * 2 - 3 * 4) / 4;
+  cards.forEach((card, i) => {
+    const x = marginX + i * (boxW + 4);
+    doc.setFillColor(...card[2]);
+    doc.roundedRect(x, y, boxW, 20, 2, 2, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11); doc.text(String(card[1]), x + boxW / 2, y + 9, { align: "center" });
+    doc.setFontSize(7.5); doc.text(card[0], x + boxW / 2, y + 15.5, { align: "center" });
+  });
+  y += 30;
+
+  doc.setTextColor(20, 20, 20); doc.setFontSize(12); doc.text("Category Scores", marginX, y); y += 7;
+  Object.entries(c.categoryScores).forEach(([k, v]) => {
+    doc.setFontSize(9); doc.setTextColor(60, 60, 60);
+    doc.text(PDF_CAT_LABELS[k] || k, marginX, y + 3);
+    const barX = marginX + 55, barW = 100, barH = 4;
+    doc.setFillColor(230, 230, 230); doc.roundedRect(barX, y, barW, barH, 1, 1, "F");
+    doc.setFillColor(...scoreRGB(v)); doc.roundedRect(barX, y, Math.max(2, barW * (v / 100)), barH, 1, 1, "F");
+    doc.setFontSize(9); doc.setTextColor(20, 20, 20); doc.text(String(v), barX + barW + 5, y + 3.2);
+    y += 7;
+  });
+
+  y += 5;
+  doc.setFontSize(12); doc.setTextColor(20, 20, 20); doc.text("Top Issues", marginX, y); y += 7;
+  c.issues.slice(0, 8).forEach((i) => {
+    if (y > 265) { doc.addPage(); y = 20; }
+    const rgb = severityRGB(i.severity);
+    doc.setFillColor(...rgb); doc.rect(marginX, y - 3.2, 2, 4.6, "F");
+    doc.setFontSize(9); doc.setTextColor(20, 20, 20);
+    doc.text(`${i.title}  [${i.severity.toUpperCase()}]`, marginX + 5, y);
+    y += 4.5;
+    doc.setFontSize(8); doc.setTextColor(100, 100, 100);
+    doc.splitTextToSize(i.why, 175).forEach((l) => { if (y > 272) { doc.addPage(); y = 20; } doc.text(l, marginX + 5, y); y += 4; });
+    y += 2;
+  });
+
+  y += 4; if (y > 260) { doc.addPage(); y = 20; }
+  doc.setFontSize(12); doc.setTextColor(20, 20, 20); doc.text("Missing Keywords", marginX, y); y += 7;
+  doc.setFontSize(9); doc.setTextColor(100, 100, 100);
+  doc.splitTextToSize(c.keywordRes.missing.slice(0, 20).join(", ") || "None", 180).forEach((l) => { if (y > 275) { doc.addPage(); y = 20; } doc.text(l, marginX, y); y += 4.5; });
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) { doc.setPage(p); drawFooter(p, pageCount); }
+
+  return doc.output("blob");
+}
+
+function downloadIndividualPDFsZip(list) {
+  const ok = list.filter((c) => !c.error);
+  if (!ok.length) { Utils.toast("No candidates match the current filter", "error"); return; }
+  if (typeof window.jspdf === "undefined" || typeof JSZip === "undefined") { Utils.toast("PDF/ZIP engine failed to load — check your connection", "error"); return; }
+  const zip = new JSZip();
+  ok.forEach((c) => { const base = c.fileName.replace(/\.(pdf|docx|txt)$/i, ""); zip.file(`${base}.pdf`, buildCandidatePDFBlob(c)); });
+  zip.generateAsync({ type: "blob" }).then((blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "candidate-reports-pdf.zip";
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+}
+
+function downloadDataZip(list) {
+  if (!list.length) { Utils.toast("No candidates match the current filter", "error"); return; }
+  if (typeof JSZip === "undefined") { Utils.toast("ZIP engine failed to load — check your connection", "error"); return; }
+  const zip = new JSZip();
+  list.forEach((c) => { const base = c.fileName.replace(/\.(pdf|docx|txt)$/i, ""); zip.file(`${base}-report.json`, JSON.stringify(c, null, 2)); });
+  zip.generateAsync({ type: "blob" }).then((blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "candidate-reports-json.zip";
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+}
+
+function buildCandidateBlock(c, idx) {
+  const esc = Utils.escapeHtml;
+  if (c.error) return `<div class="pdf-candidate" id="cand-${idx}"><h3>${esc(c.fileName)}</h3><p>${esc(c.error)}</p></div>`;
+  const topIssues = c.issues.filter((i) => i.severity === "critical" || i.severity === "high").slice(0, 6);
+  return `<div class="pdf-candidate" id="cand-${idx}">
+    <h2>${esc(c.candidateName)}</h2>
+    <p style="color:#555">${esc(c.fileName)} &middot; Match ${c.keywordRes.matchPct}% &middot; ATS Score ${c.overallScore}/100 &middot; Grade ${c.grade} (${esc(c.gradeLabel)})</p>
+    <div style="margin:16px 0">${Charts.gauge(c.overallScore)}</div>
+    <h4>Top Issues</h4>
+    <ul>${topIssues.map((i) => `<li><strong>${esc(i.title)}</strong> &mdash; ${esc(i.why)}</li>`).join("") || "<li>None</li>"}</ul>
+    <h4>Missing Keywords</h4>
+    <p>${c.keywordRes.missing.slice(0, 15).map(esc).join(", ") || "None"}</p>
+  </div>`;
+}
+
+function downloadCombinedPDF(list) {
+  if (!list.length) { Utils.toast("No candidates match the current filter", "error"); return; }
+  const esc = Utils.escapeHtml;
+  const base = new URL(".", location.href).href;
+  const toc = `<h1>Candidate Reports (${list.length})</h1><ol>${list.map((c, i) => `<li><a href="#cand-${i}">${esc(c.candidateName || c.fileName)}</a> &mdash; ${c.error ? "Error" : c.overallScore + "/100 (" + c.grade + ")"}</li>`).join("")}</ol><hr>`;
+  const body = toc + list.map(buildCandidateBlock).join("");
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Candidate Reports</title><base href="${base}">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <style>body{padding:24px;color:#111}.pdf-candidate{page-break-after:always;padding-bottom:24px;border-bottom:1px solid #ddd;margin-bottom:24px}.pdf-candidate:last-child{page-break-after:auto}</style>
+    </head><body>${body}</body></html>`;
+  const w = window.open("", "_blank");
+  if (!w) { Utils.toast("Please allow pop-ups to generate the combined PDF", "error"); return; }
+  w.document.write(html);
+  w.document.close();
+  w.onload = () => { w.focus(); w.print(); };
+}
+
+function setupResultActions() {
+  document.getElementById("search-box").addEventListener("input", renderResults);
+  document.getElementById("min-score").addEventListener("input", renderResults);
+  document.getElementById("quick-filter").addEventListener("change", renderResults);
+  document.getElementById("select-all").addEventListener("change", (e) => {
+    const list = getFilteredList().filter((c) => !c.error);
+    list.forEach((c) => { const key = candKey(c, candidates.indexOf(c)); if (e.target.checked) selected.add(key); else selected.delete(key); });
+    renderResults();
+  });
+  document.getElementById("export-csv").addEventListener("click", () => {
+    const list = getFilteredList().filter((c) => !c.error);
+    const rows = [["Rank", "Name", "File", "Match %", "ATS Score", "Grade", "Experience (yrs)", "Status", "Rating", "Critical Issues"]];
+    list.forEach((c, idx) => {
+      rows.push([idx + 1, c.candidateName, c.fileName, c.keywordRes.matchPct, c.overallScore, c.grade, c.experienceRes.totalYears, c.recruiterMeta.status, c.recruiterMeta.rating, c.issues.filter((i) => i.severity === "critical").length]);
+    });
+    Exporter.downloadCSV("candidate-ranking.csv", rows);
+  });
+  document.getElementById("export-json").addEventListener("click", () => downloadDataZip(getFilteredList().filter((c) => !c.error)));
+  document.getElementById("export-pdf-zip").addEventListener("click", () => downloadIndividualPDFsZip(getFilteredList()));
+  document.getElementById("export-pdf-all").addEventListener("click", () => downloadCombinedPDF(getFilteredList()));
+  document.getElementById("compare-btn").addEventListener("click", renderCompare);
+  document.getElementById("bulk-shortlist").addEventListener("click", () => bulkSetStatus("shortlisted"));
+  document.getElementById("bulk-interview").addEventListener("click", () => bulkSetStatus("interview"));
+  document.getElementById("bulk-rejected").addEventListener("click", () => bulkSetStatus("rejected"));
+  document.getElementById("cancel-btn").addEventListener("click", () => { cancelRequested = true; });
+  document.getElementById("retry-btn").addEventListener("click", () => {
+    const toRetry = failedFiles.slice(); failedFiles = [];
+    runScreening(toRetry, { isRetry: true });
+  });
+  Utils.qsa(".sortable").forEach((th) => th.addEventListener("click", () => {
+    const key = th.dataset.sort;
+    sortState.dir = sortState.key === key && sortState.dir === "desc" ? "asc" : "desc";
+    sortState.key = key;
+    renderResults();
+  }));
+  document.getElementById("new-batch").addEventListener("click", () => {
+    jobFiles = []; candidates = []; failedFiles = []; selected.clear();
+    document.getElementById("results-view").style.display = "none";
+    document.getElementById("compare-panel").style.display = "none";
+    document.getElementById("setup-view").style.display = "block";
+    document.getElementById("file-count").textContent = "No files selected";
+    document.getElementById("screen-btn").disabled = true;
+    document.getElementById("clear-files").style.display = "none";
+    document.getElementById("search-box").value = "";
+    document.getElementById("min-score").value = "";
+    document.getElementById("quick-filter").value = "all";
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  populate(); setupRoleSearch(); setupUpload(); setupJD(); setupResultActions();
+  document.getElementById("screen-btn").addEventListener("click", () => runScreening(jobFiles));
+});
+</script>
+</body>
+</html>

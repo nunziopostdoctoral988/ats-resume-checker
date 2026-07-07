@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About &amp; Privacy &mdash; ATS Resume Checker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%93%84</text></svg>">
+<link rel="stylesheet" href="../assets/css/variables.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/animations.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
+<link rel="stylesheet" href="../assets/css/print.css">
+</head>
+<body data-page="about">
+<div id="navbar-root"></div>
+<main class="container" style="padding-block:var(--space-10) var(--space-16);max-width:760px">
+  <div class="section-head" style="margin-bottom:var(--space-10)">
+    <div class="eyebrow">About</div>
+    <h2>What this tool is &mdash; and isn't</h2>
+  </div>
+
+  <div class="card" style="margin-bottom:var(--space-6)">
+    <h3 style="margin-bottom:var(--space-3)">How Scoring Works</h3>
+    <p style="margin-bottom:var(--space-3)">Your overall score is a weighted average of 8 rule-based categories. Nothing is a hidden "magic number":</p>
+    <div id="weights"></div>
+  </div>
+
+  <div class="card" style="margin-bottom:var(--space-6)">
+    <h3 style="margin-bottom:var(--space-3)">Important Limitations</h3>
+    <p style="margin-bottom:var(--space-2)">This is a rule-based / heuristic engine, not a connection to any real employer's actual ATS software (Workday, Taleo, Greenhouse, etc). Results are directional guidance to help you improve your resume &mdash; not a guarantee of any real-world outcome.</p>
+    <p style="margin-bottom:var(--space-2)">We do not fabricate percentile rankings ("Top 5% of candidates") because we have no real aggregate dataset of other candidates to compare against &mdash; we use transparent A+&ndash;F score bands instead.</p>
+    <p>AI rewriting / cover-letter generation is not enabled by default because it requires connecting a paid LLM API key, which isn't configured in this build.</p>
+  </div>
+
+  <div class="card" id="privacy" style="margin-bottom:var(--space-6)">
+    <h3 style="margin-bottom:var(--space-3)">Privacy</h3>
+    <p style="margin-bottom:var(--space-2)">Your resume and job description are processed entirely inside your browser using JavaScript. Files are never uploaded to any server.</p>
+    <p>Report history is stored only in your browser's local storage, on your own device. Clearing your browser data will erase it.</p>
+  </div>
+
+  <div class="card" id="terms">
+    <h3 style="margin-bottom:var(--space-3)">Terms</h3>
+    <p>This tool is provided "as is", without warranty of any kind. It is intended to help you improve your resume, not as professional career or legal advice.</p>
+  </div>
+</main>
+<div id="footer-root"></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/utils.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+document.getElementById("weights").innerHTML = Object.entries(ATSData.atsRules.categoryWeights).map(([k, v]) =>
+  `<div class="flex justify-between" style="padding-block:6px;font-size:var(--fs-sm)"><span>${k.replace(/([A-Z])/g, " $1").replace(/^./, c => c.toUpperCase())}</span><strong>${Math.round(v * 100)}%</strong></div>`
+).join("");
+</script>
+</body>
+</html>

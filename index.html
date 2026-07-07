@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS Resume Checker &mdash; Recruiter-Grade Resume Analysis</title>
+<meta name="description" content="Upload your resume, paste a job description, and get a transparent, explainable ATS score with actionable fixes. 100% client-side &mdash; your data never leaves your browser.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%93%84</text></svg>">
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/animations.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+<link rel="stylesheet" href="assets/css/print.css">
+</head>
+<body data-page="home">
+<a href="#main" class="skip-link">Skip to content</a>
+<div id="navbar-root"></div>
+
+<main id="main">
+
+  <section class="hero container">
+    <div class="eyebrow animate-fade-up">100% Private &middot; Runs In Your Browser</div>
+    <h1 class="animate-fade-up stagger-1">Know exactly why your resume gets rejected by ATS &mdash; before a recruiter ever sees it.</h1>
+    <p class="lead animate-fade-up stagger-2">Upload your resume and a job description. Get a transparent 0&ndash;100 ATS score, missing keywords, formatting risks, and line-by-line fixes &mdash; with the reasoning behind every point.</p>
+    <div class="hero-cta animate-fade-up stagger-3">
+      <a href="pages/upload.html" class="btn btn-primary btn-lg">Check My Resume Free</a>
+      <a href="#how-it-works" class="btn btn-secondary btn-lg">See How It Works</a>
+    </div>
+    <div class="trust-row animate-fade-up stagger-4">
+      <span>No sign-up required</span>
+      <span>Resume never uploaded to a server</span>
+      <span>29 industries &middot; 200+ job roles</span>
+    </div>
+    <p class="animate-fade-up stagger-4" style="margin-top:var(--space-6);font-size:var(--fs-sm)">
+      Built by Jahangir Hussen &mdash;
+      <a href="https://github.com/Jahangirhussen/" target="_blank" rel="noopener" style="color:var(--brand-500)">GitHub</a> &middot;
+      <a href="https://www.kaggle.com/Jahangirhussen" target="_blank" rel="noopener" style="color:var(--brand-500)">Kaggle</a> &middot;
+      <a href="mailto:jahangirhussen.programmer@gmail.com" style="color:var(--brand-500)">Email</a> &middot;
+      <a href="https://wa.me/8801849620018" target="_blank" rel="noopener" style="color:var(--brand-500)">WhatsApp</a>
+    </p>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">What You Get</div>
+        <h2>A recruiter-grade breakdown, not a guess</h2>
+        <p>Every score is explainable. No black-box magic numbers.</p>
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+        <div class="card card-hover feature-card">
+          <div class="icon-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          </div>
+          <h3>Overall ATS Score</h3>
+          <p>A 0&ndash;100 score with pass probability, broken into transparent category scores you can inspect.</p>
+        </div>
+        <div class="card card-hover feature-card">
+          <div class="icon-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
+          </div>
+          <h3>Keyword &amp; Skill Match</h3>
+          <p>Matches your resume against the job description and your target role&rsquo;s expected skill set &mdash; shows exactly what's missing.</p>
+        </div>
+        <div class="card card-hover feature-card">
+          <div class="icon-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4M7.8 4.2 12 2l4.2 2.2L21 6v6c0 5-3.5 8.5-9 10-5.5-1.5-9-5-9-10V6z"/></svg>
+          </div>
+          <h3>Formatting Risk Check</h3>
+          <p>Flags tables, multi-column layouts, images and other elements that can break ATS parsers.</p>
+        </div>
+        <div class="card card-hover feature-card">
+          <div class="icon-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+          </div>
+          <h3>Writing Quality</h3>
+          <p>Catches passive voice, weak verbs, buzzwords, repeated words and un-quantified bullet points.</p>
+        </div>
+        <div class="card card-hover feature-card">
+          <div class="icon-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>
+          </div>
+          <h3>Before / After Fixes</h3>
+          <p>Every issue includes why it matters, exactly where it occurs, and a rewritten example.</p>
+        </div>
+        <div class="card card-hover feature-card">
+          <div class="icon-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12h8M8 16h5"/></svg>
+          </div>
+          <h3>Role-Specific Scoring</h3>
+          <p>Pick from 200+ job roles across 29 industries &mdash; scoring adapts to what that role actually needs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how-it-works" style="background:var(--surface-alt)">
+    <div class="container" style="max-width:760px">
+      <div class="section-head">
+        <div class="eyebrow">Process</div>
+        <h2>Three steps to a better resume</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <h3>Upload your resume &amp; paste the job description</h3>
+          <p>PDF, DOCX or TXT. Pick your target role and country for tailored evaluation criteria.</p>
+        </div>
+        <div class="step">
+          <h3>We analyze 8 categories</h3>
+          <p>Keyword match, structure, formatting, writing quality, achievements, experience, education and contact info &mdash; all scored with visible reasoning.</p>
+        </div>
+        <div class="step">
+          <h3>Fix what matters, export your report</h3>
+          <p>Prioritized issues (Critical &rarr; Low), rewritten bullet examples, and a downloadable PDF/JSON report.</p>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:var(--space-8)">
+        <a href="pages/upload.html" class="btn btn-primary btn-lg">Start Free Analysis</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+        <div class="stat-tile"><div class="stat-value">8</div><div class="stat-label">Scoring Categories</div></div>
+        <div class="stat-tile"><div class="stat-value">200+</div><div class="stat-label">Job Roles</div></div>
+        <div class="stat-tile"><div class="stat-value">29</div><div class="stat-label">Industries</div></div>
+        <div class="stat-tile"><div class="stat-value">0</div><div class="stat-label">Data Uploaded To Servers</div></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="footer-root"></div>
+
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

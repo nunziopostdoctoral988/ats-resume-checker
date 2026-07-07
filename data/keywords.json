@@ -1,0 +1,20 @@
+{
+  "stopwords": ["a","an","the","and","or","but","of","in","on","at","to","for","with","by","is","are","was","were","be","been","being","this","that","these","those","it","its","as","from","into","than","then","so","such","also","will","would","can","could","should","may","might","must","have","has","had","do","does","did","not","no","yes","i","we","you","he","she","they","them","his","her","their","our","your"],
+  "certifications": ["AWS Certified","Azure Certified","Google Cloud Certified","PMP","Scrum Master","CSM","Six Sigma","CPA","CFA","CISSP","CompTIA","Cisco CCNA","Cisco CCNP","Oracle Certified","Salesforce Certified","Microsoft Certified","ITIL","CEH","OSCP","Meta Certified","IBM Certified","Coursera Certificate","Udemy Certificate","HubSpot Certified","Google Analytics Certified","Google Ads Certified","SHRM-CP","PHR"],
+  "tech_stack": ["Python","Java","JavaScript","TypeScript","C++","C#","Go","Rust","PHP","Ruby","Swift","Kotlin","React","Angular","Vue","Node.js","Django","Flask","Spring Boot","Laravel",".NET","AWS","Azure","GCP","Docker","Kubernetes","Terraform","Jenkins","Git","SQL","PostgreSQL","MySQL","MongoDB","Redis","TensorFlow","PyTorch","Pandas","NumPy","Power BI","Tableau","Excel","Figma","Photoshop","Salesforce","SAP","Jira","Confluence"],
+  "section_headers": {
+    "contact": ["contact","contact information","personal information"],
+    "summary": ["summary","professional summary","objective","career objective","profile","about me"],
+    "experience": ["experience","work experience","employment history","professional experience","career history"],
+    "education": ["education","academic background","qualifications"],
+    "skills": ["skills","technical skills","core competencies","key skills","expertise"],
+    "projects": ["projects","personal projects","key projects"],
+    "certifications": ["certifications","certificates","licenses"],
+    "awards": ["awards","honors","achievements"],
+    "publications": ["publications","papers"],
+    "research": ["research","research experience"],
+    "languages": ["languages","language proficiency"],
+    "volunteer": ["volunteer","volunteering","community service"],
+    "references": ["references"]
+  }
+}

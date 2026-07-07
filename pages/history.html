@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>History &mdash; ATS Resume Checker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%93%84</text></svg>">
+<link rel="stylesheet" href="../assets/css/variables.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/animations.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
+<link rel="stylesheet" href="../assets/css/print.css">
+</head>
+<body data-page="history">
+<div id="navbar-root"></div>
+<main class="container" style="padding-block:var(--space-10) var(--space-16);max-width:760px">
+  <div class="section-head" style="margin-bottom:var(--space-8)">
+    <div class="eyebrow">Your Reports</div>
+    <h2>Analysis History</h2>
+    <p>Stored locally in your browser only &mdash; nothing is synced to a server.</p>
+  </div>
+  <div id="list"></div>
+  <div id="empty" style="display:none;text-align:center;padding-block:var(--space-12)">
+    <p class="text-muted" style="margin-bottom:var(--space-6)">No reports yet.</p>
+    <a href="upload.html" class="btn btn-primary">Check Your First Resume</a>
+  </div>
+</main>
+<div id="footer-root"></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/utils.js"></script>
+<script src="../assets/js/storage.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+function renderHistory() {
+  const list = Storage.getHistory();
+  const root = document.getElementById("list");
+  const empty = document.getElementById("empty");
+  if (!list.length) { root.innerHTML = ""; empty.style.display = "block"; return; }
+  empty.style.display = "none";
+  root.innerHTML = list.map((r) => `
+    <div class="history-item">
+      <div class="history-score" style="background:${Utils.scoreColor(r.overallScore)}">${r.grade}</div>
+      <div class="history-meta">
+        <div class="h-title">${Utils.escapeHtml(r.fileName)} &mdash; ${r.overallScore}/100</div>
+        <div class="h-sub">${Utils.escapeHtml(r.role)} &middot; ${Utils.formatDate(r.createdAt)}</div>
+      </div>
+      <div class="history-actions">
+        <a href="report.html?id=${r.id}" class="btn btn-secondary btn-sm">View</a>
+        <button class="btn btn-ghost btn-sm" data-del="${r.id}">Delete</button>
+      </div>
+    </div>`).join("");
+  Utils.qsa("[data-del]").forEach((btn) => btn.addEventListener("click", () => {
+    Storage.deleteFromHistory(btn.dataset.del);
+    renderHistory();
+  }));
+}
+document.addEventListener("DOMContentLoaded", renderHistory);
+</script>
+</body>
+</html>

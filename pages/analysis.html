@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyzing Your Resume &mdash; ATS Resume Checker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%93%84</text></svg>">
+<link rel="stylesheet" href="../assets/css/variables.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/animations.css">
+<link rel="stylesheet" href="../assets/css/responsive.css">
+<link rel="stylesheet" href="../assets/css/print.css">
+</head>
+<body>
+<div id="navbar-root"></div>
+<main class="container">
+  <div class="loader-wrap" id="loader">
+    <div class="spinner"></div>
+    <h3>Analyzing your resume...</h3>
+    <div id="steps" style="margin-top:var(--space-4);text-align:left"></div>
+  </div>
+  <div id="error-state" style="display:none;text-align:center;padding-block:var(--space-16)">
+    <h3>Something went wrong</h3>
+    <p id="error-msg" class="text-muted" style="margin-block:var(--space-3) var(--space-6)"></p>
+    <a href="upload.html" class="btn btn-primary">Back to Upload</a>
+  </div>
+</main>
+<div id="footer-root"></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/utils.js"></script>
+<script src="../assets/js/validator.js"></script>
+<script src="../assets/js/storage.js"></script>
+<script src="../assets/js/parser.js"></script>
+<script src="../assets/js/ats-checker.js"></script>
+<script src="../assets/js/charts.js"></script>
+<script src="../assets/js/app.js"></script>
+
+<script>
+const STEPS = ["Parsing document", "Matching keywords", "Checking formatting", "Scoring achievements", "Finalizing report"];
+
+function renderSteps() {
+  document.getElementById("steps").innerHTML = STEPS.map((s, i) =>
+    `<div class="loader-step" id="step-${i}">${s}...</div>`).join("");
+}
+
+function runSteps() {
+  return new Promise((resolve) => {
+    STEPS.forEach((_, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(`step-${i}`);
+        if (el) { el.classList.add("done"); el.textContent = STEPS[i] + " ✓"; }
+        if (i === STEPS.length - 1) resolve();
+      }, (i + 1) * 450);
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  renderSteps();
+  const input = Storage.getPendingInput();
+  if (!input) { location.href = "upload.html"; return; }
+  try {
+    await runSteps();
+    const report = AtsChecker.analyze(input);
+    Storage.saveReport(report);
+    Storage.setCurrentReport(report);
+    location.href = "report.html?id=" + report.id;
+  } catch (err) {
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("error-state").style.display = "block";
+    document.getElementById("error-msg").textContent = err.message || "Analysis failed. Please try again.";
+  }
+});
+</script>
+</body>
+</html>
